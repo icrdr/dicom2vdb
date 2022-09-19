@@ -32,4 +32,5 @@ reboot your system OS! (maybe)
 set VCPKG_DEFAULT_TRIPLET=x64-windows
 vcpkg install openvdb
 vcpkg install itk
+vcpkg install qt5
 ```
