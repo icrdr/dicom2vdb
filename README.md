@@ -35,5 +35,21 @@ vcpkg install itk
 ```
 
 6. install 
-
-path\to\sciter-sdk\bin\packfolder.exe ui resources.cpp -v "resources"
+```shell
+mkdir build
+cd build
+cmake -E env SCITER_ROOT="path/to/sciter-js-sdk" cmake ..
+cmake cmake --build .
+```
+"cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        }
+      },
+      "environment": {
+        "VCPKG_ROOT": "C:/Users/icrdr/vcpkg",
+        "SCITER_ROOT": "C:/Users/icrdr/sciter-js-sdk"
+      }

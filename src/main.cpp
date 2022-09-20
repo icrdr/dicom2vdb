@@ -10,11 +10,15 @@
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkStatisticsImageFilter.h"
 #include "openvdb/openvdb.h"
+#include <thread>
+#include <future>
+#include <chrono>
 
-int convertDICOM2VDB(std::string dirName)
+int convertDICOM2VDB(std::string dirName, sciter::value callback)
 {
     itk::GDCMImageIOFactory::RegisterOneFactory();
     using NamesGeneratorType = itk::GDCMSeriesFileNames;
+    std::wstring info;
     auto nameGenerator = NamesGeneratorType::New();
 
     nameGenerator->SetUseSeriesDetails(true);
@@ -39,7 +43,9 @@ int convertDICOM2VDB(std::string dirName)
         else
         {
             std::cout << "No DICOMs in: " << dirName << std::endl;
-            return EXIT_SUCCESS;
+            // std::wstring widestr = aux::utf2w(info); // utf8 -> utf16
+            callback.call(0);
+            return 0;
         }
 
         while (seriesItr != seriesEnd)
@@ -136,27 +142,30 @@ int convertDICOM2VDB(std::string dirName)
     catch (const itk::ExceptionObject &ex)
     {
         std::cout << ex << std::endl;
-        return EXIT_FAILURE;
+        callback.call(2);
+        return 0;
     }
-    return EXIT_SUCCESS;
+    callback.call(1);
+    return 0;
 }
 
-class frame : public sciter::window
+class appWindow : public sciter::window
 {
 public:
-    frame() : window(SW_TITLEBAR | SW_RESIZEABLE | SW_CONTROLS | SW_MAIN | SW_ENABLE_DEBUG) {}
-    // passport - lists native functions and properties exposed to script under 'frame' interface name:
-    SOM_PASSPORT_BEGIN(frame)
+    appWindow() : window(SW_TITLEBAR | SW_RESIZEABLE | SW_CONTROLS | SW_MAIN | SW_ENABLE_DEBUG) {}
+    // passport - lists native functions and properties exposed to script under 'appWindow' interface name:
+    SOM_PASSPORT_BEGIN(appWindow)
     SOM_FUNCS(
         SOM_FUNC(convertDICOM))
     SOM_PASSPORT_END
     // function expsed to script:
-    sciter::value convertDICOM(sciter::value param1)
+    bool convertDICOM(sciter::value p_dirName, sciter::value callback)
     {
-        std::string dirName = param1.get<std::string>();
-        std::cout << dirName << std::endl;
-        convertDICOM2VDB(dirName);
-        return dirName;
+        std::string dirName = p_dirName.get<std::string>();
+        std::thread t(convertDICOM2VDB, dirName, callback);
+        t.detach();
+        // std::future<int> resultFromConvertion = std::async(std::launch::async, convertDICOM2VDB, dirName);
+        return true;
     }
 };
 
@@ -165,7 +174,7 @@ public:
 int uimain(std::function<int()> run)
 {
     sciter::archive::instance().open(aux::elements_of(resources));
-    sciter::om::hasset<frame> pwin = new frame();
+    sciter::om::hasset<appWindow> pwin = new appWindow();
     pwin->load(WSTR("this://app/main.html"));
     // or use this to load UI from
     //   pwin->load( WSTR("file:///home/andrew/Desktop/Project/res/main.htm") );

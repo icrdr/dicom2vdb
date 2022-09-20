@@ -16,13 +16,13 @@
   </body>
   <script type="text/javascript">
     const thisWindow = Window.this;
-    
+
     document.getElementById("folder").onclick = function () {
       saveFolderPathString();
     };
 
-    document.getElementById("convert").onclick = function () {
-      convertDICOM();
+    document.getElementById("convert").onclick = async function () {
+      await convertDICOM();
     };
 
     function saveFolderPathString() {
@@ -37,9 +37,31 @@
       }
     }
 
-    function convertDICOM() {
-      thisWindow.frame.convertDICOM(globalThis.folderPath);
-      document.getElementById("result").innerText = "ok";
+    async function convertDICOM() {
+      document.getElementById("result").innerText = "working......";
+      document.getElementById("convert").disabled = true;
+      function callback(stateCode) {
+        let info = "";
+        switch (stateCode) {
+          case 0:
+            info = "no dicoms";
+            break;
+          case 1:
+            info = "ok";
+            break;
+          case 2:
+            info = "failed";
+            break;
+
+          default:
+            break;
+        }
+        document.getElementById("convert").disabled = false;
+        document.getElementById("result").innerText = info;
+      }
+      thisWindow.appWindow.convertDICOM(globalThis.folderPath, callback);
     }
+
+    globalThis.Initdd = Initdd;
   </script>
 </html>

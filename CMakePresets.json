@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Visual Studio 17 2022 x64",
+      "description": "Visual Studio 17 2022 x64",
+      "generator": "Visual Studio 17 2022",
+      "toolset": "host=x64",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        }
+      },
+      "environment": {
+        "VCPKG_ROOT": "C:/Users/icrdr/vcpkg",
+        "SCITER_ROOT": "C:/Users/icrdr/sciter-js-sdk"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug",
+      "configurePreset": "default",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Release",
+      "configurePreset": "default",
+      "configuration": "Release"
+    }
+  ]
+}
