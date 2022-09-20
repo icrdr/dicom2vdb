@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <title>convert DICOM to OpenVDB</title>
+    <style>
+      body {
+        vertical-align: middle;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="folder">Choose Dicom Folder</button>
+    <div id="path">Folder Path</div>
+    <button id="convert">Convert It</button>
+    <div id="result">Result</div>
+  </body>
+  <script type="text/javascript">
+    const thisWindow = Window.this;
+    
+    document.getElementById("folder").onclick = function () {
+      saveFolderPathString();
+    };
+
+    document.getElementById("convert").onclick = function () {
+      convertDICOM();
+    };
+
+    function saveFolderPathString() {
+      let folderPath = thisWindow.selectFolder({
+        mode: "open",
+      });
+
+      if (folderPath) {
+        folderPath = folderPath.replace("file://", "");
+        globalThis.folderPath = folderPath;
+        document.getElementById("path").innerText = globalThis.folderPath;
+      }
+    }
+
+    function convertDICOM() {
+      thisWindow.frame.convertDICOM(globalThis.folderPath);
+      document.getElementById("result").innerText = "ok";
+    }
+  </script>
+</html>

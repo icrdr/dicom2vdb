@@ -32,5 +32,8 @@ reboot your system OS! (maybe)
 set VCPKG_DEFAULT_TRIPLET=x64-windows
 vcpkg install openvdb
 vcpkg install itk
-vcpkg install qt5
 ```
+
+6. install 
+
+path\to\sciter-sdk\bin\packfolder.exe ui resources.cpp -v "resources"
