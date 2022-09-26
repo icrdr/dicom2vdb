@@ -15,7 +15,7 @@ include_directories(${SCITER_SDK_INCLUDE})
 add_executable(${APP_NAME} src/main.cpp "${SCITER_SDK_INCLUDE}/sciter-win-main.cpp")
 
 target_link_libraries(${APP_NAME} PRIVATE OpenVDB::openvdb)
-target_link_libraries(${APP_NAME} PRIVATE ITKCommon ITKIOImageBase ITKIOGDCM ITKIONRRD)
+target_link_libraries(${APP_NAME} PRIVATE ITKCommon ITKIOImageBase ITKIOGDCM ITKIONRRD ITKIOTransformBase)
 
 # PackFolder to generate resources.cpp
 add_custom_command(TARGET ${APP_NAME} PRE_BUILD

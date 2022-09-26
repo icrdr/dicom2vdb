@@ -13,6 +13,14 @@
     <div id="path">Folder Path</div>
     <button id="convert">Convert It</button>
     <div id="result">Result</div>
+    <div id="inputMin">inputMin</div>
+    <div id="inputMax">inputMax</div>
+    <div id="inputSize">inputSize</div>
+    <div id="inputSpacing">inputSpacing</div>
+    <div id="outputMin">outputMin</div>
+    <div id="outputMax">outputMax</div>
+    <div id="outputSize">outputSize</div>
+    <div id="outputSpacing">outputSpacing</div>
   </body>
   <script type="text/javascript">
     const thisWindow = Window.this;
@@ -31,35 +39,68 @@
       });
 
       if (folderPath) {
-        folderPath = folderPath.replace("file://", "");
-        globalThis.folderPath = folderPath;
+        globalThis.folderPath = folderPath.replace("file://", "");
         document.getElementById("path").innerText = globalThis.folderPath;
       }
+      document.getElementById("result").innerText = "working......";
+      document.getElementById("convert").disabled = true;
+      function callback(res) {
+        if (res["state"] === 0) {
+          const inputMeta = {
+            min: res["data"]["input_min"],
+            max: res["data"]["input_max"],
+            spacing: res["data"]["input_spacing"],
+            size: res["data"]["input_size"],
+          };
+
+          const outputMeta = {
+            min: 0,
+            max: -res["data"]["input_min"] + res["data"]["input_max"],
+            spacing: [1, 1, 1],
+            size: res["data"]["input_size"].map((dim, index) => {
+              return dim * res["data"]["input_spacing"][index];
+            }),
+          };
+          globalThis.inputMeta = inputMeta;
+          globalThis.outputMeta = outputMeta;
+
+          document.getElementById("inputMin").innerText = inputMeta["min"];
+          document.getElementById("inputMax").innerText = inputMeta["max"];
+          document.getElementById("inputSize").innerText = inputMeta["size"];
+          document.getElementById("inputSpacing").innerText =
+            inputMeta["spacing"];
+          document.getElementById("outputMin").innerText = outputMeta["min"];
+          document.getElementById("outputMax").innerText = outputMeta["max"];
+          document.getElementById("outputSize").innerText = outputMeta["size"];
+          document.getElementById("outputSpacing").innerText =
+            outputMeta["spacing"];
+          document.getElementById("result").innerText = "ok";
+        } else {
+          document.getElementById("result").innerText = res["data"];
+        }
+
+        document.getElementById("convert").disabled = false;
+      }
+      thisWindow.appWindow.getMetaInfo(globalThis.folderPath, callback);
     }
 
     async function convertDICOM() {
       document.getElementById("result").innerText = "working......";
       document.getElementById("convert").disabled = true;
-      function callback(stateCode) {
-        let info = "";
-        switch (stateCode) {
-          case 0:
-            info = "no dicoms";
-            break;
-          case 1:
-            info = "ok";
-            break;
-          case 2:
-            info = "failed";
-            break;
-
-          default:
-            break;
-        }
+      function callback(res) {
+        document.getElementById("result").innerText = res;
+        // if (res["state"] === 0) {
+        //   document.getElementById("result").innerText = "ok";
+        // } else {
+        //   document.getElementById("result").innerText = res["data"];
+        // }
         document.getElementById("convert").disabled = false;
-        document.getElementById("result").innerText = info;
       }
-      thisWindow.appWindow.convertDICOM(globalThis.folderPath, callback);
+      thisWindow.appWindow.convertDICOM(
+        globalThis.folderPath,
+        { max: 1000 },
+        callback
+      );
     }
 
     globalThis.Initdd = Initdd;
