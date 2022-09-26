@@ -88,17 +88,16 @@
       document.getElementById("result").innerText = "working......";
       document.getElementById("convert").disabled = true;
       function callback(res) {
-        document.getElementById("result").innerText = res;
-        // if (res["state"] === 0) {
-        //   document.getElementById("result").innerText = "ok";
-        // } else {
-        //   document.getElementById("result").innerText = res["data"];
-        // }
+        if (res["state"] === 0) {
+          document.getElementById("result").innerText = "completed";
+        } else {
+          document.getElementById("result").innerText = res["data"];
+        }
         document.getElementById("convert").disabled = false;
       }
       thisWindow.appWindow.convertDICOM(
         globalThis.folderPath,
-        { max: 1000 },
+        globalThis.outputMeta,
         callback
       );
     }

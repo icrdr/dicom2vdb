@@ -45,12 +45,6 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
         auto seriesItr = seriesUID.begin();
         auto seriesEnd = seriesUID.end();
 
-        if (seriesItr == seriesEnd)
-        {
-            callback.call(0);
-            return 0;
-        }
-
         seriesItr = seriesUID.begin();
         while (seriesItr != seriesUID.end())
         {
@@ -76,20 +70,31 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
             reader->Update();
 
             ImageType::Pointer image = reader->GetOutput();
-            ImageType::SpacingType inputSpacing = image->GetSpacing();
-            ImageType::RegionType inputRegion = image->GetLargestPossibleRegion();
-            ImageType::SizeType inputSize = inputRegion.GetSize();
             ImageType::PointType inputOrigin = image->GetOrigin();
 
+            // rescale value
+            using RescaleFilterType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
+            auto rescalefilter = RescaleFilterType::New();
+
+            sciter::value min_key = sciter::value::from_string(L"min");
+            sciter::value max_key = sciter::value::from_string(L"max");
+
+            float min_val = outputMeta.get_item(min_key).get<float>();
+            float max_val = outputMeta.get_item(max_key).get<float>();
+
+            printf("Min: %.1f\n", min_val);
+            printf("Max: %.1f\n", max_val);
+
+            rescalefilter->SetInput(image);
+            rescalefilter->SetOutputMinimum(min_val);
+            rescalefilter->SetOutputMaximum(max_val);
+            rescalefilter->Update();
+            image = rescalefilter->GetOutput();
+
+            // resample size
             ImageType::SizeType outputSize;
             ImageType::SpacingType outputSpacing;
             ImageType::PointType outputOrigin = inputOrigin;
-
-            for (unsigned int dim = 0; dim < Dimension; ++dim)
-            {
-                outputSpacing[dim] = 1;
-                outputSize[dim] = static_cast<double>(inputSize[dim]) * static_cast<double>(inputSpacing[dim]);
-            }
 
             using TransformType = itk::IdentityTransform<ScaleType, Dimension>;
             using LinearInterpolatorType = itk::LinearInterpolateImageFunction<ImageType, ScaleType>;
@@ -97,6 +102,19 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
             auto transformer = TransformType::New();
             auto interpolator = LinearInterpolatorType::New();
             auto resampleFilter = ResampleFilterType::New();
+
+            sciter::value size_key = sciter::value::from_string(L"size");
+            sciter::value spacing_key = sciter::value::from_string(L"spacing");
+
+            std::vector<double> size_val = outputMeta.get_item(size_key).get<std::vector<double>>();
+            std::vector<double> spacing_val = outputMeta.get_item(spacing_key).get<std::vector<double>>();
+            printf("Size: [%.1f, %.1f, %.1f]\n", size_val[0], size_val[1], size_val[2]);
+            printf("Spacing: [%.1f, %.1f, %.1f]\n", spacing_val[0], spacing_val[1], spacing_val[2]);
+            for (unsigned int dim = 0; dim < Dimension; ++dim)
+            {
+                outputSpacing[dim] = spacing_val[dim];
+                outputSize[dim] = size_val[dim];
+            }
 
             resampleFilter->SetInput(image);
             resampleFilter->SetTransform(transformer);
@@ -106,17 +124,6 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
             resampleFilter->SetOutputOrigin(outputOrigin);
             resampleFilter->Update();
             image = resampleFilter->GetOutput();
-
-            using RescaleFilterType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
-            auto rescalefilter = RescaleFilterType::New();
-            // outputMeta.set_item("max",10000);
-            sciter::value max = outputMeta.get<std::vector<std::string>>();
-            callback.call(max);
-            rescalefilter->SetInput(image);
-            rescalefilter->SetOutputMinimum(outputMeta.get_item('min').get<float>());
-            rescalefilter->SetOutputMaximum(outputMeta.get_item('max').get<float>());
-            rescalefilter->Update();
-            image = rescalefilter->GetOutput();
 
             // Initialize the OpenVDB library.  This must be called at least
             // once per program and may safely be called multiple times.
@@ -158,7 +165,8 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
             sciter::value res;
             res.set_item("data", "ok");
             res.set_item("state", 0);
-            // callback.call(res);
+            callback.call(res);
+            printf("Convertion Completed!\n");
         }
     }
     catch (const itk::ExceptionObject &ex)
