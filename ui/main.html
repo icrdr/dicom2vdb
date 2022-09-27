@@ -1,4 +1,6 @@
-<html>
+<!DOCTYPE html>
+<html window-frame="none" window-resizable="'none">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <head>
     <title>convert DICOM to OpenVDB</title>
     <style>
@@ -7,10 +9,13 @@
         text-align: center;
       }
     </style>
+    InitddsaveDicomFolderPathStr
   </head>
   <body>
-    <button id="folder">Choose Dicom Folder</button>
-    <div id="path">Folder Path</div>
+    <button id="dicomFolderBtn">Choose Dicom Folder</button>
+    <div id="dicomPath">Dicom Path</div>
+    <button id="outputFolderBtn">Choose Output Folder</button>
+    <div id="outputPath">Output Path</div>
     <button id="convert">Convert It</button>
     <div id="result">Result</div>
     <div id="inputMin">inputMin</div>
@@ -25,22 +30,27 @@
   <script type="text/javascript">
     const thisWindow = Window.this;
 
-    document.getElementById("folder").onclick = function () {
-      saveFolderPathString();
+    document.ready = function () {
+      thisWindow.isResizable = false;
+      thisWindow.isMaximizable = false;
+      thisWindow.move(200, 200, 900, 432);
     };
 
-    document.getElementById("convert").onclick = async function () {
-      await convertDICOM();
-    };
-
-    function saveFolderPathString() {
-      let folderPath = thisWindow.selectFolder({
+    document.getElementById("dicomFolderBtn").onclick = function () {
+      let dicomPath = thisWindow.selectFolder({
         mode: "open",
       });
 
-      if (folderPath) {
-        globalThis.folderPath = folderPath.replace("file://", "");
-        document.getElementById("path").innerText = globalThis.folderPath;
+      if (dicomPath) {
+        globalThis.dicomPath = decodeURIComponent(dicomPath.replace("file://", ""));
+        document.getElementById("dicomPath").innerText = globalThis.dicomPath;
+        if (globalThis.outputPath === undefined) {
+          const path_arr = globalThis.dicomPath.split("/");
+          path_arr.pop();
+          globalThis.outputPath = path_arr.join("/");
+          document.getElementById("outputPath").innerText =
+            globalThis.outputPath;
+        }
       }
       document.getElementById("result").innerText = "working......";
       document.getElementById("convert").disabled = true;
@@ -81,27 +91,51 @@
 
         document.getElementById("convert").disabled = false;
       }
-      thisWindow.appWindow.getMetaInfo(globalThis.folderPath, callback);
-    }
+      thisWindow.appWindow.getMetaInfo(globalThis.dicomPath, callback);
+    };
 
-    async function convertDICOM() {
+    document.getElementById("outputFolderBtn").onclick = function () {
+      let outputPath = thisWindow.selectFolder({
+        mode: "open",
+      });
+
+      if (outputPath) {
+        globalThis.outputPath = decodeURIComponent(outputPath.replace("file://", ""));
+        document.getElementById("outputPath").innerText = globalThis.outputPath;
+      }
+    };
+
+    document.getElementById("convert").onclick = function () {
+      if (
+        (globalThis.dicomPath === undefined) |
+        (globalThis.outputPath === undefined)
+      ) {
+        thisWindow.modal(
+          <info>
+            Dicom or output folder is not defined.
+            <br />
+            Please choose folder path first.
+          </info>
+        );
+        return false;
+      }
+
       document.getElementById("result").innerText = "working......";
       document.getElementById("convert").disabled = true;
       function callback(res) {
-        if (res["state"] === 0) {
-          document.getElementById("result").innerText = "completed";
+        if (res["state"] === 2) {
+          document.getElementById("result").innerText = res["data"];
         } else {
+          document.getElementById("convert").disabled = false;
           document.getElementById("result").innerText = res["data"];
         }
-        document.getElementById("convert").disabled = false;
       }
       thisWindow.appWindow.convertDICOM(
-        globalThis.folderPath,
+        globalThis.dicomPath,
+        globalThis.outputPath,
         globalThis.outputMeta,
         callback
       );
-    }
-
-    globalThis.Initdd = Initdd;
+    };
   </script>
 </html>

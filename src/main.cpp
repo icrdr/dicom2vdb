@@ -25,18 +25,22 @@
 #include <future>
 #include <chrono>
 
-int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value callback)
+int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::value outputMeta, sciter::value callback)
 {
-    std::string _dirName = dirName.get<std::string>();
+    std::string _dicomPath = dicomPath.get<std::string>();
+    std::string _outputPath = outputPath.get<std::string>();
     itk::GDCMImageIOFactory::RegisterOneFactory();
-    using NamesGeneratorType = itk::GDCMSeriesFileNames;
+
     std::wstring info;
+    sciter::value res;
+
+    using NamesGeneratorType = itk::GDCMSeriesFileNames;
     auto nameGenerator = NamesGeneratorType::New();
 
     nameGenerator->SetUseSeriesDetails(true);
     nameGenerator->AddSeriesRestriction("0008|0021");
     nameGenerator->SetGlobalWarningDisplay(false);
-    nameGenerator->SetDirectory(_dirName);
+    nameGenerator->SetDirectory(_dicomPath);
 
     try
     {
@@ -44,6 +48,10 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
         const SeriesIdContainer &seriesUID = nameGenerator->GetSeriesUIDs();
         auto seriesItr = seriesUID.begin();
         auto seriesEnd = seriesUID.end();
+
+        res.set_item("data", 0);
+        res.set_item("state", 2);
+        callback.call(res);
 
         seriesItr = seriesUID.begin();
         while (seriesItr != seriesUID.end())
@@ -68,6 +76,10 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
             reader->SetFileNames(fileNames);
             reader->ForceOrthogonalDirectionOff(); // properly read CTs with gantry tilt
             reader->Update();
+
+            res.set_item("data", 10);
+            res.set_item("state", 2);
+            callback.call(res);
 
             ImageType::Pointer image = reader->GetOutput();
             ImageType::PointType inputOrigin = image->GetOrigin();
@@ -125,6 +137,10 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
             resampleFilter->Update();
             image = resampleFilter->GetOutput();
 
+            res.set_item("data", 30);
+            res.set_item("state", 2);
+            callback.call(res);
+
             // Initialize the OpenVDB library.  This must be called at least
             // once per program and may safely be called multiple times.
             openvdb::initialize();
@@ -156,13 +172,18 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
             openvdb::GridPtrVec grids;
             grids.push_back(grid);
 
+            res.set_item("data", 90);
+            res.set_item("state", 2);
+            callback.call(res);
+
+            std::string dicomFolderName = _dicomPath.substr(_dicomPath.find_last_of("/\\") + 1);
+            std::string outputFilePath = _outputPath + "/" + dicomFolderName + ".vdb";
+
             // Write out the contents of the container.
-            std::string outputfile = _dirName + ".vdb";
-            openvdb::io::File file(outputfile);
+            openvdb::io::File file(outputFilePath);
             file.write(grids);
             file.close();
 
-            sciter::value res;
             res.set_item("data", "ok");
             res.set_item("state", 0);
             callback.call(res);
@@ -171,7 +192,6 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
     }
     catch (const itk::ExceptionObject &ex)
     {
-        sciter::value res;
         res.set_item("data", "error");
         res.set_item("state", 1);
         callback.call(res);
@@ -181,18 +201,23 @@ int _convertDICOM(sciter::value dirName, sciter::value outputMeta, sciter::value
     return 0;
 }
 
-int _getMetaInfo(sciter::value dirName, sciter::value callback)
+
+int _getMetaInfo(sciter::value dicomPath, sciter::value callback)
 {
-    std::string _dirName = dirName.get<std::string>();
+    std::string _dicomPath = dicomPath.get<std::string>();
+    std::cout << _dicomPath << std::endl;
     itk::GDCMImageIOFactory::RegisterOneFactory();
-    using NamesGeneratorType = itk::GDCMSeriesFileNames;
+
     std::wstring info;
+    sciter::value res;
+
+    using NamesGeneratorType = itk::GDCMSeriesFileNames;
     auto nameGenerator = NamesGeneratorType::New();
 
     nameGenerator->SetUseSeriesDetails(true);
     nameGenerator->AddSeriesRestriction("0008|0021");
     nameGenerator->SetGlobalWarningDisplay(false);
-    nameGenerator->SetDirectory(_dirName);
+    nameGenerator->SetDirectory(_dicomPath);
 
     try
     {
@@ -203,7 +228,6 @@ int _getMetaInfo(sciter::value dirName, sciter::value callback)
 
         if (seriesItr == seriesEnd)
         {
-            sciter::value res;
             res.set_item("data", "no dicoms");
             res.set_item("state", 1);
             callback.call(res);
@@ -248,7 +272,6 @@ int _getMetaInfo(sciter::value dirName, sciter::value callback)
             std::vector<float> inputSize_f(inputSize.begin(), inputSize.end());
             std::vector<float> inputSpacing_f(inputSpacing.begin(), inputSpacing.end());
 
-            sciter::value res;
             sciter::value data;
 
             data.set_item("input_min", inputMin);
@@ -262,7 +285,6 @@ int _getMetaInfo(sciter::value dirName, sciter::value callback)
     }
     catch (const itk::ExceptionObject &ex)
     {
-        sciter::value res;
         res.set_item("data", "error");
         res.set_item("state", 1);
         callback.call(res);
@@ -282,16 +304,16 @@ public:
         SOM_FUNC(getMetaInfo))
     SOM_PASSPORT_END
     // function expsed to script:
-    int convertDICOM(sciter::value dirName, sciter::value ouputMeta, sciter::value callback)
+    int convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::value ouputMeta, sciter::value callback)
     {
-        std::thread t(_convertDICOM, dirName, ouputMeta, callback);
+        std::thread t(_convertDICOM, dicomPath, outputPath, ouputMeta, callback);
         t.detach();
         return 0;
     }
 
-    int getMetaInfo(sciter::value dirName, sciter::value callback)
+    int getMetaInfo(sciter::value dicomPath, sciter::value callback)
     {
-        std::thread t(_getMetaInfo, dirName, callback);
+        std::thread t(_getMetaInfo, dicomPath, callback);
         t.detach();
         return 0;
     }
