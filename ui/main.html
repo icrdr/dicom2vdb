@@ -3,29 +3,155 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <head>
     <title>convert DICOM to OpenVDB</title>
-    <style>
-      body {
-        vertical-align: middle;
-        text-align: center;
-      }
-    </style>
-    InitddsaveDicomFolderPathStr
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <button id="dicomFolderBtn">Choose Dicom Folder</button>
-    <div id="dicomPath">Dicom Path</div>
-    <button id="outputFolderBtn">Choose Output Folder</button>
-    <div id="outputPath">Output Path</div>
-    <button id="convert">Convert It</button>
-    <div id="result">Result</div>
-    <div id="inputMin">inputMin</div>
-    <div id="inputMax">inputMax</div>
-    <div id="inputSize">inputSize</div>
-    <div id="inputSpacing">inputSpacing</div>
-    <div id="outputMin">outputMin</div>
-    <div id="outputMax">outputMax</div>
-    <div id="outputSize">outputSize</div>
-    <div id="outputSpacing">outputSpacing</div>
+    <div class="main">
+      <div class="form-container">
+        <div class="folder-inputs-container">
+          <div class="folder-input-container">
+            <div class="folder-label">
+              <span style="color: #3f7aff">Step1:</span>
+              <span style="color: #9397a6">
+                Select folder which contains the dicom files.
+              </span>
+            </div>
+            <div class="folder-input">
+              <div class="folder-input-btn">
+                <svg
+                  class="folder-input-btn-icon"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1.45825 2.33333C1.45825 2.01117 1.71942 1.75 2.04159 1.75H5.54158L6.99992 3.5H11.9583C12.2804 3.5 12.5416 3.76116 12.5416 4.08333V11.6667C12.5416 11.9888 12.2804 12.25 11.9583 12.25H2.04159C1.71942 12.25 1.45825 11.9888 1.45825 11.6667V2.33333Z"
+                    stroke="white"
+                    stroke-width="1.2"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M12.5416 6.41675H1.45825"
+                    stroke="white"
+                    stroke-width="1.2"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div
+                class="folder-input-input"
+                tooltip="E:/dddddddddddddddddddTest/Projects/DICOM APPS/Proj..."
+                tooltip-position="buttom"
+              >
+                <div class="folder-input-input-text">
+                  E:/dddddddddddddddddddTest/Projects/DICOM APPS/Proj...
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="folder-input-container">
+            <div class="folder-label">
+              <span style="color: #3f7aff">Step2(Optional):</span>
+              <span style="color: #9397a6">
+                Select output folder / edit meta info.
+              </span>
+            </div>
+            <div class="folder-input">
+              <div class="folder-input-btn">
+                <svg
+                  class="folder-input-btn-icon"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1.45825 2.33333C1.45825 2.01117 1.71942 1.75 2.04159 1.75H5.54158L6.99992 3.5H11.9583C12.2804 3.5 12.5416 3.76116 12.5416 4.08333V11.6667C12.5416 11.9888 12.2804 12.25 11.9583 12.25H2.04159C1.71942 12.25 1.45825 11.9888 1.45825 11.6667V2.33333Z"
+                    stroke="white"
+                    stroke-width="1.2"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M12.5416 6.41675H1.45825"
+                    stroke="white"
+                    stroke-width="1.2"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div
+                class="folder-input-input"
+                tooltip="E:/dddddddddddddddddddTest/Projects/DICOM APPS/Proj..."
+                tooltip-position="buttom"
+              >
+                <div class="folder-input-input-text">
+                  E:/dddddddddddddddddddTest/Projects/DICOM APPS/Proj...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="meta-tables-container">
+          <div class="meta-table"></div>
+          <div class="arrow-containter">
+            <svg
+              class="arrow"
+              width="20"
+              height="44"
+              viewBox="0 0 20 44"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                opacity="0.4"
+                d="M19.0989 20.7994C19.6328 21.5108 19.6328 22.4892 19.0989 23.2006L4.09957 43.1849C2.94603 44.7218 0.5 43.906 0.5 41.9843L0.500001 2.01568C0.500002 0.0940162 2.94603 -0.721804 4.09958 0.815118L19.0989 20.7994Z"
+                fill="#3F7AFF"
+              />
+            </svg>
+          </div>
+          <div class="meta-table"><table>
+            <tr>
+              <td>This</td>
+              <td>Little</td>
+              <td>Piggy</td>
+              <td>Went</td>
+              <td>To</td>
+              <td>Market</td>
+            </tr>
+            <tr>
+              <td colspan="2">This</td>
+              <td>Little</td>
+              <td>Piggy</td>
+              <td>Went</td>
+              <td>To</td>
+            </tr>
+              <tr>
+              <td colspan="4">This</td>
+              <td rowspan="3">Little</td>
+              <td>Piggy</td>
+            </tr>
+            <tr>
+              <td rowspan="2">This</td>
+              <td>Little</td>
+              <td>Piggy</td>
+              <td>Went</td>
+              <td>To</td>
+            </tr>
+            <tr>
+              <td>Little</td>
+              <td>Piggy</td>
+              <td>Went</td>
+              <td>To</td>
+            </tr>
+          </table></div>
+        </div>
+      </div>
+      <div class="convert-btn">Step3: CONVERT</div>
+      <div class="banner-container"></div>
+    </div>
   </body>
   <script type="text/javascript">
     const thisWindow = Window.this;
@@ -33,7 +159,7 @@
     document.ready = function () {
       thisWindow.isResizable = false;
       thisWindow.isMaximizable = false;
-      thisWindow.move(200, 200, 900, 432);
+      thisWindow.move(200, 200, 720, 560);
     };
 
     document.getElementById("dicomFolderBtn").onclick = function () {
@@ -42,7 +168,9 @@
       });
 
       if (dicomPath) {
-        globalThis.dicomPath = decodeURIComponent(dicomPath.replace("file://", ""));
+        globalThis.dicomPath = decodeURIComponent(
+          dicomPath.replace("file://", "")
+        );
         document.getElementById("dicomPath").innerText = globalThis.dicomPath;
         if (globalThis.outputPath === undefined) {
           const path_arr = globalThis.dicomPath.split("/");
@@ -100,7 +228,9 @@
       });
 
       if (outputPath) {
-        globalThis.outputPath = decodeURIComponent(outputPath.replace("file://", ""));
+        globalThis.outputPath = decodeURIComponent(
+          outputPath.replace("file://", "")
+        );
         document.getElementById("outputPath").innerText = globalThis.outputPath;
       }
     };
