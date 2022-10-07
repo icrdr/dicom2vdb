@@ -40,15 +40,7 @@
                   />
                 </svg>
               </div>
-              <div
-                class="folder-input-input"
-                tooltip="E:/dddddddddddddddddddTest/Projects/DICOM APPS/Proj..."
-                tooltip-position="buttom"
-              >
-                <div class="folder-input-input-text">
-                  E:/dddddddddddddddddddTest/Projects/DICOM APPS/Proj...
-                </div>
-              </div>
+              <input class="folder-input-input" type="text" />
             </div>
           </div>
           <div class="folder-input-container">
@@ -82,20 +74,40 @@
                   />
                 </svg>
               </div>
-              <div
-                class="folder-input-input"
-                tooltip="E:/dddddddddddddddddddTest/Projects/DICOM APPS/Proj..."
-                tooltip-position="buttom"
-              >
-                <div class="folder-input-input-text">
-                  E:/dddddddddddddddddddTest/Projects/DICOM APPS/Proj...
-                </div>
-              </div>
+              <input class="folder-input-input" />
             </div>
           </div>
         </div>
         <div class="meta-tables-container">
-          <div class="meta-table"></div>
+          <table class="meta-table">
+            <tbody>
+              <th colspan="4" class="meta-table-header">Input Meta</th>
+              <tr>
+                <th>Min</th>
+                <td colspan="3">
+                  <input type="number"  class="meta-table-input"/>
+                </td>
+              </tr>
+              <tr>
+                <th>Max</th>
+                <td colspan="3">
+                  <input type="number"  class="meta-table-input"/>
+                </td>
+              </tr>
+              <tr>
+                <th>Spacing</th>
+                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number"  class="meta-table-input"/></td>
+              </tr>
+              <tr>
+                <th>Size</th>
+                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number"  class="meta-table-input"/></td>
+              </tr>
+            </tbody>
+          </table>
           <div class="arrow-containter">
             <svg
               class="arrow"
@@ -112,41 +124,35 @@
               />
             </svg>
           </div>
-          <div class="meta-table"><table>
-            <tr>
-              <td>This</td>
-              <td>Little</td>
-              <td>Piggy</td>
-              <td>Went</td>
-              <td>To</td>
-              <td>Market</td>
-            </tr>
-            <tr>
-              <td colspan="2">This</td>
-              <td>Little</td>
-              <td>Piggy</td>
-              <td>Went</td>
-              <td>To</td>
-            </tr>
+          <table class="meta-table">
+            <tbody>
+              <th colspan="4" class="meta-table-header">Output Meta</th>
               <tr>
-              <td colspan="4">This</td>
-              <td rowspan="3">Little</td>
-              <td>Piggy</td>
-            </tr>
-            <tr>
-              <td rowspan="2">This</td>
-              <td>Little</td>
-              <td>Piggy</td>
-              <td>Went</td>
-              <td>To</td>
-            </tr>
-            <tr>
-              <td>Little</td>
-              <td>Piggy</td>
-              <td>Went</td>
-              <td>To</td>
-            </tr>
-          </table></div>
+                <th>Min</th>
+                <td colspan="3">
+                  <input type="number"  class="meta-table-input"/>
+                </td>
+              </tr>
+              <tr>
+                <th>Max</th>
+                <td colspan="3">
+                  <input type="number"  class="meta-table-input"/>
+                </td>
+              </tr>
+              <tr>
+                <th>Spacing</th>
+                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number"  class="meta-table-input"/></td>
+              </tr>
+              <tr>
+                <th>Size</th>
+                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number"  class="meta-table-input"/></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div class="convert-btn">Step3: CONVERT</div>
