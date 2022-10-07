@@ -139,12 +139,11 @@ html {
   border-collapse: collapse;
 }
 
-.meta-table-input {
+.meta-table input:first-child {
   padding: 0px 9px;
-  height: 28px;
+  height: 60px;
   width: 100%;
-  border: 2px;
-  text-align: center;
+  border: 0px;
 }
 
 .meta-table th,
@@ -153,7 +152,7 @@ html {
   font-weight: 400;
   color: #9397a6;
   border: 1px solid #e5e6eb;
-  padding: 0 9px;
+  padding: 0;
   font-size: 12px;
 }
 
@@ -170,7 +169,7 @@ html {
 }
 
 .meta-table td {
-  width: 30px;
+  width: 70px;
 }
 
 .arrow-containter {
