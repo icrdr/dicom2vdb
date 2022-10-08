@@ -17,7 +17,7 @@
               </span>
             </div>
             <div class="folder-input">
-              <div class="folder-input-btn">
+              <div class="folder-input-btn" id="dicomFolderBtn">
                 <svg
                   class="folder-input-btn-icon"
                   width="14"
@@ -40,7 +40,7 @@
                   />
                 </svg>
               </div>
-              <input class="folder-input-input" type="text" />
+              <input class="folder-input-input" id="dicomPath" type="text" />
             </div>
           </div>
           <div class="folder-input-container">
@@ -51,7 +51,7 @@
               </span>
             </div>
             <div class="folder-input">
-              <div class="folder-input-btn">
+              <div class="folder-input-btn" id="outputFolderBtn">
                 <svg
                   class="folder-input-btn-icon"
                   width="14"
@@ -74,7 +74,7 @@
                   />
                 </svg>
               </div>
-              <input class="folder-input-input" />
+              <input class="folder-input-input" id="outputPath" type="text" />
             </div>
           </div>
         </div>
@@ -85,26 +85,68 @@
               <tr>
                 <th>Min</th>
                 <td colspan="3">
-                  <input type="number" maxlength="8">
+                  <input type="number" maxlength="10" readonly id="inputMin" />
                 </td>
               </tr>
               <tr>
                 <th>Max</th>
                 <td colspan="3">
-                  <input type="number"  class="meta-table-input"/>
+                  <input type="number" maxlength="10" readonly id="inputMax" />
                 </td>
               </tr>
               <tr>
                 <th>Spacing</th>
-                <td><input type="number"  class="meta-table-input"/></td>
-                <td><input type="number"  class="meta-table-input"/></td>
-                <td><input type="number"  class="meta-table-input"/></td>
+                <td>
+                  <input
+                    type="number"
+                    maxlength="10"
+                    readonly
+                    id="inputSpacingX"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    maxlength="10"
+                    readonly
+                    id="inputSpacingY"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    maxlength="10"
+                    readonly
+                    id="inputSpacingZ"
+                  />
+                </td>
               </tr>
               <tr>
                 <th>Size</th>
-                <td><input type="number"  class="meta-table-input"/></td>
-                <td><input type="number"  class="meta-table-input"/></td>
-                <td><input type="number"  class="meta-table-input"/></td>
+                <td>
+                  <input
+                    type="number"
+                    maxlength="10"
+                    readonly
+                    id="inputSizeX"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    maxlength="10"
+                    readonly
+                    id="inputSizeY"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    maxlength="10"
+                    readonly
+                    id="inputSizeZ"
+                  />
+                </td>
               </tr>
             </tbody>
           </table>
@@ -124,38 +166,44 @@
               />
             </svg>
           </div>
-          <table class="meta-table">
+          <table class="meta-table output">
             <tbody>
               <th colspan="4" class="meta-table-header">Output Meta</th>
               <tr>
                 <th>Min</th>
                 <td colspan="3">
-                  <input type="number"  class="meta-table-input"/>
+                  <input type="number" maxlength="10" id="outputMin" />
                 </td>
               </tr>
               <tr>
                 <th>Max</th>
                 <td colspan="3">
-                  <input type="number"  class="meta-table-input"/>
+                  <input type="number" maxlength="10" id="outputMax" />
                 </td>
               </tr>
               <tr>
                 <th>Spacing</th>
-                <td><input type="number"  class="meta-table-input"/></td>
-                <td><input type="number"  class="meta-table-input"/></td>
-                <td><input type="number"  class="meta-table-input"/></td>
+                <td>
+                  <input type="number" maxlength="10" id="outputSpacingX" />
+                </td>
+                <td>
+                  <input type="number" maxlength="10" id="outputSpacingY" />
+                </td>
+                <td>
+                  <input type="number" maxlength="10" id="outputSpacingZ" />
+                </td>
               </tr>
               <tr>
                 <th>Size</th>
-                <td><input type="number"  class="meta-table-input"/></td>
-                <td><input type="number"  class="meta-table-input"/></td>
-                <td><input type="number"  class="meta-table-input"/></td>
+                <td><input type="number" maxlength="10" id="outputSizeX" /></td>
+                <td><input type="number" maxlength="10" id="outputSizeY" /></td>
+                <td><input type="number" maxlength="10" id="outputSizeZ" /></td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-      <div class="convert-btn">Step3: CONVERT</div>
+      <div class="convert-btn" id="convert">Step3: CONVERT</div>
       <div class="banner-container"></div>
     </div>
   </body>
@@ -166,7 +214,215 @@
       thisWindow.isResizable = false;
       thisWindow.isMaximizable = false;
       thisWindow.move(200, 200, 720, 560);
+      // document.getElementById("convert").disabled = true;
+      globalThis.inputMeta = {
+        min: 0,
+        max: 0,
+        spacing: [0, 0, 0],
+        size: [0, 0, 0],
+      };
+      globalThis.outputMeta = {
+        min: 0,
+        max: 0,
+        spacing: [0, 0, 0],
+        size: [0, 0, 0],
+      };
     };
+
+    document.getElementById("dicomPath").onblur = (event) => {
+      globalThis.dicomPath = event.target.value;
+      getMetaInfo();
+    };
+
+    document.getElementById("outputPath").onblur = (event) => {
+      globalThis.outputPath = event.target.value;
+    };
+
+    document.getElementById("outputMin").onblur = (event) => {
+      const outputMeta = globalThis.outputMeta;
+      outputMeta["min"] = event.target.value || 0;
+      globalThis.outputMeta = outputMeta;
+      document.getElementById("outputMin").value = globalThis.outputMeta["min"];
+    };
+
+    document.getElementById("outputMax").onblur = (event) => {
+      const outputMeta = globalThis.outputMeta;
+      outputMeta["max"] = event.target.value || 0;
+      globalThis.outputMeta = outputMeta;
+      document.getElementById("outputMax").value = globalThis.outputMeta["max"];
+    };
+
+    document.getElementById("outputSpacingX").onblur = (event) => {
+      const outputMeta = globalThis.outputMeta;
+      const inputSpacingX = globalThis.inputMeta["spacing"][0];
+      const inputSizeX = globalThis.inputMeta["size"][0];
+      const outputSpacingX = event.target.value || 0;
+      const outputSizeX =
+        Math.round(((inputSpacingX * inputSizeX) / outputSpacingX) * 1e1) / 1e1;
+
+      // update global var
+      outputMeta["spacing"][0] = outputSpacingX;
+      outputMeta["size"][0] = outputSizeX;
+      globalThis.outputMeta = outputMeta;
+
+      // update ui
+      document.getElementById("outputSpacingX").value = outputSpacingX;
+      document.getElementById("outputSizeX").value = outputSizeX;
+    };
+
+    document.getElementById("outputSpacingY").onblur = (event) => {
+      const outputMeta = globalThis.outputMeta;
+      const inputSpacingY = globalThis.inputMeta["spacing"][1];
+      const inputSizeY = globalThis.inputMeta["size"][1];
+      const outputSpacingY = event.target.value || 0;
+      const outputSizeY =
+        Math.round(((inputSpacingY * inputSizeY) / outputSpacingY) * 1e1) / 1e1;
+
+      // update global var
+      outputMeta["spacing"][1] = outputSpacingY;
+      outputMeta["size"][1] = outputSizeY;
+      globalThis.outputMeta = outputMeta;
+
+      // update ui
+      document.getElementById("outputSpacingY").value = outputSpacingY;
+      document.getElementById("outputSizeY").value = outputSizeY;
+    };
+
+    document.getElementById("outputSpacingZ").onblur = (event) => {
+      const outputMeta = globalThis.outputMeta;
+      const inputSpacingZ = globalThis.inputMeta["spacing"][2];
+      const inputSizeZ = globalThis.inputMeta["size"][2];
+      const outputSpacingZ = event.target.value || 0;
+      const outputSizeZ =
+        Math.round(((inputSpacingZ * inputSizeZ) / outputSpacingZ) * 1e1) / 1e1;
+
+      // update global var
+      outputMeta["spacing"][2] = outputSpacingZ;
+      outputMeta["size"][2] = outputSizeZ;
+      globalThis.outputMeta = outputMeta;
+
+      // update ui
+      document.getElementById("outputSpacingZ").value = outputSpacingZ;
+      document.getElementById("outputSizeZ").value = outputSizeZ;
+    };
+
+    document.getElementById("outputSizeX").onblur = (event) => {
+      const outputMeta = globalThis.outputMeta;
+      const inputSpacingX = globalThis.inputMeta["spacing"][0];
+      const inputSizeX = globalThis.inputMeta["size"][0];
+      const outputSizeX = event.target.value || 0;
+      const outputSpacingX =
+        Math.round(((inputSpacingX * inputSizeX) / outputSizeX) * 1e2) / 1e2;
+
+      // update global var
+      outputMeta["spacing"][0] = outputSpacingX;
+      outputMeta["size"][0] = outputSizeX;
+      globalThis.outputMeta = outputMeta;
+
+      // update ui
+      document.getElementById("outputSpacingX").value = outputSpacingX;
+      document.getElementById("outputSizeX").value = outputSizeX;
+    };
+
+    document.getElementById("outputSizeY").onblur = (event) => {
+      const outputMeta = globalThis.outputMeta;
+      const inputSpacingY = globalThis.inputMeta["spacing"][1];
+      const inputSizeY = globalThis.inputMeta["size"][1];
+      const outputSizeY = event.target.value || 0;
+      const outputSpacingY =
+        Math.round(((inputSpacingY * inputSizeY) / outputSizeY) * 1e2) / 1e2;
+
+      // update global var
+      outputMeta["spacing"][1] = outputSpacingY;
+      outputMeta["size"][1] = outputSizeY;
+      globalThis.outputMeta = outputMeta;
+
+      // update ui
+      document.getElementById("outputSpacingY").value = outputSpacingY;
+      document.getElementById("outputSizeY").value = outputSizeY;
+    };
+
+    document.getElementById("outputSizeZ").onblur = (event) => {
+      const outputMeta = globalThis.outputMeta;
+      const inputSpacingZ = globalThis.inputMeta["spacing"][2];
+      const inputSizeZ = globalThis.inputMeta["size"][2];
+      const outputSizeZ = event.target.value || 0;
+      const outputSpacingZ =
+        Math.round(((inputSpacingZ * inputSizeZ) / outputSizeZ) * 1e2) / 1e2;
+
+      // update global var
+      outputMeta["spacing"][2] = outputSpacingZ;
+      outputMeta["size"][2] = outputSizeZ;
+      globalThis.outputMeta = outputMeta;
+
+      // update ui
+      document.getElementById("outputSpacingZ").value = outputSpacingZ;
+      document.getElementById("outputSizeZ").value = outputSizeZ;
+    };
+
+    document.getElementById("outputPath").onchange = (event) => {
+      globalThis.outputPath = event.target.value || 0;
+    };
+
+    document.getElementById("outputPath").onchange = (event) => {
+      globalThis.outputPath = event.target.value || 0;
+    };
+
+    function getMetaInfo() {
+      document.getElementById("convert").innerText = "analysising......";
+      document.getElementById("convert").disabled = true;
+
+      function callback(res) {
+        if (res["state"] === 0) {
+          const inputMeta = {
+            min: res["data"]["input_min"],
+            max: res["data"]["input_max"],
+            spacing: res["data"]["input_spacing"],
+            size: res["data"]["input_size"],
+          };
+
+          const outputMeta = {
+            min: 0,
+            max: -res["data"]["input_min"] + res["data"]["input_max"],
+            spacing: [1, 1, 1],
+            size: res["data"]["input_size"].map((dim, index) => {
+              const size = dim * res["data"]["input_spacing"][index];
+              return Math.round(size * 1e1) / 1e1;
+            }),
+          };
+          globalThis.inputMeta = inputMeta;
+          globalThis.outputMeta = outputMeta;
+
+          document.getElementById("inputMin").value = inputMeta["min"];
+          document.getElementById("inputMax").value = inputMeta["max"];
+          document.getElementById("inputSizeX").value = inputMeta["size"][0];
+          document.getElementById("inputSizeY").value = inputMeta["size"][1];
+          document.getElementById("inputSizeZ").value = inputMeta["size"][2];
+          document.getElementById("inputSpacingX").value =
+            inputMeta["spacing"][0];
+          document.getElementById("inputSpacingY").value =
+            inputMeta["spacing"][1];
+          document.getElementById("inputSpacingZ").value =
+            inputMeta["spacing"][2];
+          document.getElementById("outputMin").value = outputMeta["min"];
+          document.getElementById("outputMax").value = outputMeta["max"];
+          document.getElementById("outputSizeX").value = outputMeta["size"][0];
+          document.getElementById("outputSizeY").value = outputMeta["size"][1];
+          document.getElementById("outputSizeZ").value = outputMeta["size"][2];
+          document.getElementById("outputSpacingX").value =
+            outputMeta["spacing"][0];
+          document.getElementById("outputSpacingY").value =
+            outputMeta["spacing"][1];
+          document.getElementById("outputSpacingZ").value =
+            outputMeta["spacing"][2];
+          document.getElementById("convert").innerText = "Step3: CONVERT";
+          document.getElementById("convert").disabled = false;
+        } else {
+          document.getElementById("convert").innerText = res["data"];
+        }
+      }
+      thisWindow.appWindow.getMetaInfo(globalThis.dicomPath, callback);
+    }
 
     document.getElementById("dicomFolderBtn").onclick = function () {
       let dicomPath = thisWindow.selectFolder({
@@ -186,46 +442,8 @@
             globalThis.outputPath;
         }
       }
-      document.getElementById("result").innerText = "working......";
-      document.getElementById("convert").disabled = true;
-      function callback(res) {
-        if (res["state"] === 0) {
-          const inputMeta = {
-            min: res["data"]["input_min"],
-            max: res["data"]["input_max"],
-            spacing: res["data"]["input_spacing"],
-            size: res["data"]["input_size"],
-          };
 
-          const outputMeta = {
-            min: 0,
-            max: -res["data"]["input_min"] + res["data"]["input_max"],
-            spacing: [1, 1, 1],
-            size: res["data"]["input_size"].map((dim, index) => {
-              return dim * res["data"]["input_spacing"][index];
-            }),
-          };
-          globalThis.inputMeta = inputMeta;
-          globalThis.outputMeta = outputMeta;
-
-          document.getElementById("inputMin").innerText = inputMeta["min"];
-          document.getElementById("inputMax").innerText = inputMeta["max"];
-          document.getElementById("inputSize").innerText = inputMeta["size"];
-          document.getElementById("inputSpacing").innerText =
-            inputMeta["spacing"];
-          document.getElementById("outputMin").innerText = outputMeta["min"];
-          document.getElementById("outputMax").innerText = outputMeta["max"];
-          document.getElementById("outputSize").innerText = outputMeta["size"];
-          document.getElementById("outputSpacing").innerText =
-            outputMeta["spacing"];
-          document.getElementById("result").innerText = "ok";
-        } else {
-          document.getElementById("result").innerText = res["data"];
-        }
-
-        document.getElementById("convert").disabled = false;
-      }
-      thisWindow.appWindow.getMetaInfo(globalThis.dicomPath, callback);
+      getMetaInfo();
     };
 
     document.getElementById("outputFolderBtn").onclick = function () {
@@ -242,30 +460,57 @@
     };
 
     document.getElementById("convert").onclick = function () {
-      if (
-        (globalThis.dicomPath === undefined) |
-        (globalThis.outputPath === undefined)
-      ) {
-        thisWindow.modal(
-          <info>
-            Dicom or output folder is not defined.
-            <br />
-            Please choose folder path first.
-          </info>
-        );
-        return false;
-      }
+      // if (
+      //   (globalThis.dicomPath === undefined) |
+      //   (globalThis.outputPath === undefined)
+      // ) {
+      //   thisWindow.modal(
+      //     <alert>
+      //       Dicom or output folder is not defined.
+      //       <br />
+      //       Please choose folder path first.
+      //     </alert>
+      //   );
+      //   return false;
+      // }
 
-      document.getElementById("result").innerText = "working......";
+      document.getElementById("convert").innerText = "working......";
       document.getElementById("convert").disabled = true;
       function callback(res) {
         if (res["state"] === 2) {
-          document.getElementById("result").innerText = res["data"];
+          document.getElementById("convert").innerText = res["data"];
         } else {
           document.getElementById("convert").disabled = false;
-          document.getElementById("result").innerText = res["data"];
+          if (res["state"] === 0) {
+            thisWindow.modal(<info>Convertion Completed</info>);
+            document.getElementById("convert").innerText = "Step3: CONVERT";
+          } else {
+            document.getElementById("convert").innerText = res["data"];
+          }
         }
       }
+
+      thisWindow.modal(
+        <info>
+          Min: {globalThis.outputMeta["min"]}
+          <br />
+          Max: {globalThis.outputMeta["max"]}
+          <br />
+          Spacing:
+          <br />
+          {globalThis.outputMeta["spacing"][0]},<br />
+          {globalThis.outputMeta["spacing"][1]},<br />
+          {globalThis.outputMeta["spacing"][2]}
+          <br />
+          Size:
+          <br />
+          {globalThis.outputMeta["size"][0]},<br />
+          {globalThis.outputMeta["size"][1]},<br />
+          {globalThis.outputMeta["size"][2]}
+          <br />
+        </info>
+      );
+
       thisWindow.appWindow.convertDICOM(
         globalThis.dicomPath,
         globalThis.outputPath,

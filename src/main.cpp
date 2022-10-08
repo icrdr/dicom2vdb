@@ -24,6 +24,7 @@
 #include <thread>
 #include <future>
 #include <chrono>
+#include <shellapi.h>
 
 int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::value outputMeta, sciter::value callback)
 {
@@ -188,6 +189,7 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
             res.set_item("state", 0);
             callback.call(res);
             printf("Convertion Completed!\n");
+            ShellExecuteA(NULL, "open", _outputPath.c_str(), NULL, NULL, SW_SHOWDEFAULT);
         }
     }
     catch (const itk::ExceptionObject &ex)

@@ -92,6 +92,16 @@ html {
   border-radius: 4px;
 }
 
+.folder-input-btn:hover {
+  background-color: #2A6BFF;
+  color: #ffffff;
+}
+
+.folder-input-btn:disabled,
+.folder-input-btn[disabled]{
+  background-color: #78A1FE;
+}
+
 .folder-input-btn-icon {
   background-color: transparent;
   position: relative;
@@ -106,6 +116,7 @@ html {
 
   width: 260px;
   background: #ffffff;
+  color: #9397A6;
   border: 1px solid #e5e6eb;
   border-radius: 4px;
   padding: 0px 11px;
@@ -139,37 +150,51 @@ html {
   border-collapse: collapse;
 }
 
-.meta-table input:first-child {
-  padding: 0px 9px;
-  height: 60px;
-  width: 100%;
-  border: 0px;
-}
-
 .meta-table th,
 .meta-table td {
   font-style: normal;
   font-weight: 400;
   color: #9397a6;
   border: 1px solid #e5e6eb;
-  padding: 0;
   font-size: 12px;
 }
 
 .meta-table th {
+  width: 103px;
+  padding: 0 9px;
   text-align: right;
-  width: 90px;
   background: #f4f4f4;
 }
 
 .meta-table .meta-table-header {
-  height: 35px;
+  height: 34px;
   text-align: left;
-  background: #fff;
+  background: #ffffff;
 }
 
 .meta-table td {
-  width: 70px;
+  width: 55px;
+  padding: 0 7px;
+  text-align: center;
+  background: #ffffff;
+}
+
+.meta-table input {
+  padding: 0;
+  width: 100%;
+  border: 0px;
+}
+
+.meta-table input caption {
+  color: #9397A6;
+  padding: 0;
+  line-height: 26px;
+  height: 26px;
+  border: 0px;
+}
+
+.output input caption {
+  color: #2A6BFF;
 }
 
 .arrow-containter {
@@ -189,38 +214,38 @@ html {
   transform: translate(-50%, -50%);
 }
 
-.convert-btn-container {
+.convert-btn {
   width: 640px;
   height: 40px;
-}
-.convert-btn {
-  position: absolute;
-  left: 0%;
-  right: 0%;
-  top: 50%;
-  bottom: 41.67%;
-
   background: #3f7aff;
   border-radius: 4px;
-}
-.convert-btn-text {
-  position: absolute;
-  width: 113px;
-  height: 16px;
-  left: calc(50% - 113px / 2 - 0.5px);
-  top: calc(50% - 16px / 2 + 20px);
-
-  font-family: "Arial";
-  font-style: normal;
-  font-weight: 400;
   font-size: 14px;
-  line-height: 16px;
-  /* identical to box height */
-
   text-align: center;
+  line-height: 40px;
+  color:#ffffff
+}
 
+.convert-btn {
+  width: 640px;
+  height: 40px;
+  background: #3f7aff;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  line-height: 40px;
+  color:#ffffff
+}
+
+.convert-btn:hover {
+  background-color: #2A6BFF;
   color: #ffffff;
 }
+
+.convert-btn:disabled,
+.convert-btn[disabled]{
+  background-color: #78A1FE;
+}
+
 .banner-container {
   width: 640px;
   height: 180px;
