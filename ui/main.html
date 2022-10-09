@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-<html
-  window-frame="none"
-  window-resizable="'none"
-  window-icon="icon.ico"
->
+<html window-frame="none" window-resizable="'none" window-icon="icon.ico">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <head>
     <title>DICOM to OpenVDB Converter by OmooLab</title>
@@ -257,8 +253,10 @@
     };
 
     document.getElementById("dicomPath").onblur = (event) => {
+      const oldPath = globalThis.dicomPath;
       globalThis.dicomPath = event.target.value;
-      if (globalThis.dicomPath != "") getMetaInfo();
+      if (globalThis.dicomPath != "" && globalThis.dicomPath != oldPath)
+        getMetaInfo();
     };
 
     document.getElementById("outputPath").onblur = (event) => {
@@ -385,14 +383,6 @@
       // update ui
       document.getElementById("outputSpacingZ").value = outputSpacingZ;
       document.getElementById("outputSizeZ").value = outputSizeZ;
-    };
-
-    document.getElementById("outputPath").onchange = (event) => {
-      globalThis.outputPath = event.target.value || 0;
-    };
-
-    document.getElementById("outputPath").onchange = (event) => {
-      globalThis.outputPath = event.target.value || 0;
     };
 
     function getMetaInfo() {
