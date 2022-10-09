@@ -5,6 +5,7 @@ set(SCITER_BINARY_DLL_FILE "${SCITER_ROOT}/bin/windows/x64/sciter.dll")
 set(SCITER_PACKFOLDER_DIR "${SCITER_ROOT}/bin/windows")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:wWinMainCRTStartup") # fix entry point problem
 set(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO )
+set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/resource.rc")
 
 cmake_minimum_required(VERSION 3.1.5)
 project(${APP_NAME} VERSION 0.1.0)
@@ -13,7 +14,7 @@ find_package(ITK CONFIG REQUIRED)
 find_package(OpenVDB CONFIG REQUIRED)
 include_directories(${SCITER_SDK_INCLUDE})
 
-add_executable(${APP_NAME} src/main.cpp "${SCITER_SDK_INCLUDE}/sciter-win-main.cpp" WindowsApplicationUseUtf8.manifest)
+add_executable(${APP_NAME} src/main.cpp "${SCITER_SDK_INCLUDE}/sciter-win-main.cpp" WindowsApplicationUseUtf8.manifest ${APP_ICON_RESOURCE_WINDOWS})
 
 target_link_libraries(${APP_NAME} PRIVATE OpenVDB::openvdb)
 target_link_libraries(${APP_NAME} PRIVATE ITKCommon ITKIOImageBase ITKIOGDCM ITKIONRRD ITKIOTransformBase)
