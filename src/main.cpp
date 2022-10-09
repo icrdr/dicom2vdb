@@ -50,7 +50,7 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
         auto seriesItr = seriesUID.begin();
         auto seriesEnd = seriesUID.end();
 
-        res.set_item("data", 0);
+        res.set_item("data", "0%");
         res.set_item("state", 2);
         callback.call(res);
 
@@ -78,7 +78,7 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
             reader->ForceOrthogonalDirectionOff(); // properly read CTs with gantry tilt
             reader->Update();
 
-            res.set_item("data", 10);
+            res.set_item("data", "10%");
             res.set_item("state", 2);
             callback.call(res);
 
@@ -138,7 +138,7 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
             resampleFilter->Update();
             image = resampleFilter->GetOutput();
 
-            res.set_item("data", 30);
+            res.set_item("data", "30%");
             res.set_item("state", 2);
             callback.call(res);
 
@@ -173,7 +173,7 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
             openvdb::GridPtrVec grids;
             grids.push_back(grid);
 
-            res.set_item("data", 90);
+            res.set_item("data", "90%");
             res.set_item("state", 2);
             callback.call(res);
 
@@ -231,7 +231,7 @@ int _getMetaInfo(sciter::value dicomPath, sciter::value callback)
         if (seriesItr == seriesEnd)
         {
             res.set_item("data", "no dicoms");
-            res.set_item("state", 1);
+            res.set_item("state", 2);
             callback.call(res);
             return 0;
         }

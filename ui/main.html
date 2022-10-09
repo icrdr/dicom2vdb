@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html window-frame="none" window-resizable="'none">
+<html
+  window-frame="none"
+  window-resizable="'none"
+  window-icon="icon.svg"
+>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <head>
-    <title>convert DICOM to OpenVDB</title>
+    <title>DICOM to OpenVDB Converter by OmooLab</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -203,35 +207,58 @@
           </table>
         </div>
       </div>
-      <div class="convert-btn" id="convert">Step3: CONVERT</div>
+      <div class="convert-btn" id="convert">
+        <div class="convert-progress" id="progress"></div>
+        <div class="convert-btn-text" id="state">Step3: CONVERT</div>
+      </div>
       <div class="banner-container"></div>
     </div>
   </body>
   <script type="text/javascript">
     const thisWindow = Window.this;
 
+    const empty = {
+      min: "",
+      max: "",
+      spacing: ["", "", ""],
+      size: ["", "", ""],
+    };
+
+    function fillMetaInfo() {
+      document.getElementById("inputMin").value = inputMeta["min"];
+      document.getElementById("inputMax").value = inputMeta["max"];
+      document.getElementById("inputSizeX").value = inputMeta["size"][0];
+      document.getElementById("inputSizeY").value = inputMeta["size"][1];
+      document.getElementById("inputSizeZ").value = inputMeta["size"][2];
+      document.getElementById("inputSpacingX").value = inputMeta["spacing"][0];
+      document.getElementById("inputSpacingY").value = inputMeta["spacing"][1];
+      document.getElementById("inputSpacingZ").value = inputMeta["spacing"][2];
+      document.getElementById("outputMin").value = outputMeta["min"];
+      document.getElementById("outputMax").value = outputMeta["max"];
+      document.getElementById("outputSizeX").value = outputMeta["size"][0];
+      document.getElementById("outputSizeY").value = outputMeta["size"][1];
+      document.getElementById("outputSizeZ").value = outputMeta["size"][2];
+      document.getElementById("outputSpacingX").value =
+        outputMeta["spacing"][0];
+      document.getElementById("outputSpacingY").value =
+        outputMeta["spacing"][1];
+      document.getElementById("outputSpacingZ").value =
+        outputMeta["spacing"][2];
+    }
+
     document.ready = function () {
       thisWindow.isResizable = false;
       thisWindow.isMaximizable = false;
-      thisWindow.move(200, 200, 720, 560);
-      // document.getElementById("convert").disabled = true;
-      globalThis.inputMeta = {
-        min: 0,
-        max: 0,
-        spacing: [0, 0, 0],
-        size: [0, 0, 0],
-      };
-      globalThis.outputMeta = {
-        min: 0,
-        max: 0,
-        spacing: [0, 0, 0],
-        size: [0, 0, 0],
-      };
+      thisWindow.move(400, 400, 715, 577);
+      document.getElementById("convert").disabled = true;
+      globalThis.inputMeta = empty;
+      globalThis.outputMeta = empty;
+      fillMetaInfo();
     };
 
     document.getElementById("dicomPath").onblur = (event) => {
       globalThis.dicomPath = event.target.value;
-      getMetaInfo();
+      if (globalThis.dicomPath != "") getMetaInfo();
     };
 
     document.getElementById("outputPath").onblur = (event) => {
@@ -369,56 +396,50 @@
     };
 
     function getMetaInfo() {
-      document.getElementById("convert").innerText = "analysising......";
+      document.getElementById("state").innerText = "Searching...";
       document.getElementById("convert").disabled = true;
 
       function callback(res) {
-        if (res["state"] === 0) {
-          const inputMeta = {
-            min: res["data"]["input_min"],
-            max: res["data"]["input_max"],
-            spacing: res["data"]["input_spacing"],
-            size: res["data"]["input_size"],
-          };
+        switch (res["state"]) {
+          case 0:
+            const inputMeta = {
+              min: res["data"]["input_min"],
+              max: res["data"]["input_max"],
+              spacing: res["data"]["input_spacing"],
+              size: res["data"]["input_size"],
+            };
 
-          const outputMeta = {
-            min: 0,
-            max: -res["data"]["input_min"] + res["data"]["input_max"],
-            spacing: [1, 1, 1],
-            size: res["data"]["input_size"].map((dim, index) => {
-              const size = dim * res["data"]["input_spacing"][index];
-              return Math.round(size * 1e1) / 1e1;
-            }),
-          };
-          globalThis.inputMeta = inputMeta;
-          globalThis.outputMeta = outputMeta;
+            const outputMeta = {
+              min: 0,
+              max: -res["data"]["input_min"] + res["data"]["input_max"],
+              spacing: [1, 1, 1],
+              size: res["data"]["input_size"].map((dim, index) => {
+                const size = dim * res["data"]["input_spacing"][index];
+                return Math.round(size * 1e1) / 1e1;
+              }),
+            };
 
-          document.getElementById("inputMin").value = inputMeta["min"];
-          document.getElementById("inputMax").value = inputMeta["max"];
-          document.getElementById("inputSizeX").value = inputMeta["size"][0];
-          document.getElementById("inputSizeY").value = inputMeta["size"][1];
-          document.getElementById("inputSizeZ").value = inputMeta["size"][2];
-          document.getElementById("inputSpacingX").value =
-            inputMeta["spacing"][0];
-          document.getElementById("inputSpacingY").value =
-            inputMeta["spacing"][1];
-          document.getElementById("inputSpacingZ").value =
-            inputMeta["spacing"][2];
-          document.getElementById("outputMin").value = outputMeta["min"];
-          document.getElementById("outputMax").value = outputMeta["max"];
-          document.getElementById("outputSizeX").value = outputMeta["size"][0];
-          document.getElementById("outputSizeY").value = outputMeta["size"][1];
-          document.getElementById("outputSizeZ").value = outputMeta["size"][2];
-          document.getElementById("outputSpacingX").value =
-            outputMeta["spacing"][0];
-          document.getElementById("outputSpacingY").value =
-            outputMeta["spacing"][1];
-          document.getElementById("outputSpacingZ").value =
-            outputMeta["spacing"][2];
-          document.getElementById("convert").innerText = "Step3: CONVERT";
-          document.getElementById("convert").disabled = false;
-        } else {
-          document.getElementById("convert").innerText = res["data"];
+            globalThis.inputMeta = inputMeta;
+            globalThis.outputMeta = outputMeta;
+            fillMetaInfo();
+
+            document.getElementById("state").innerText = "Step3: CONVERT";
+            document.getElementById("convert").disabled = false;
+            break;
+          case 1:
+            globalThis.inputMeta = empty;
+            globalThis.outputMeta = empty;
+            fillMetaInfo();
+            document.getElementById("state").innerText = res["data"];
+            break;
+          case 2:
+            globalThis.inputMeta = empty;
+            globalThis.outputMeta = empty;
+            fillMetaInfo();
+            document.getElementById("state").innerText = "No Dicoms Found";
+            break;
+          default:
+            break;
         }
       }
       thisWindow.appWindow.getMetaInfo(globalThis.dicomPath, callback);
@@ -474,42 +495,52 @@
       //   return false;
       // }
 
-      document.getElementById("convert").innerText = "working......";
+      document.getElementById("state").innerText = "Started...";
+      document.getElementById("progress").style.visibility = "visible";
+      document.getElementById("progress").style.width = 0;
       document.getElementById("convert").disabled = true;
+
       function callback(res) {
-        if (res["state"] === 2) {
-          document.getElementById("convert").innerText = res["data"];
-        } else {
-          document.getElementById("convert").disabled = false;
-          if (res["state"] === 0) {
+        switch (res["state"]) {
+          case 0:
             thisWindow.modal(<info>Convertion Completed</info>);
-            document.getElementById("convert").innerText = "Step3: CONVERT";
-          } else {
-            document.getElementById("convert").innerText = res["data"];
-          }
+            document.getElementById("progress").style.visibility = "hidden";
+            document.getElementById("state").innerText = "Step3: CONVERT";
+            document.getElementById("convert").disabled = false;
+            break;
+          case 1:
+            document.getElementById("progress").style.visibility = "hidden";
+            document.getElementById("state").innerText = res["data"];
+            document.getElementById("convert").disabled = false;
+            break;
+          case 2:
+            document.getElementById("progress").style.width = res["data"];
+            document.getElementById("state").innerText = res["data"];
+          default:
+            break;
         }
       }
 
-      thisWindow.modal(
-        <info>
-          Min: {globalThis.outputMeta["min"]}
-          <br />
-          Max: {globalThis.outputMeta["max"]}
-          <br />
-          Spacing:
-          <br />
-          {globalThis.outputMeta["spacing"][0]},<br />
-          {globalThis.outputMeta["spacing"][1]},<br />
-          {globalThis.outputMeta["spacing"][2]}
-          <br />
-          Size:
-          <br />
-          {globalThis.outputMeta["size"][0]},<br />
-          {globalThis.outputMeta["size"][1]},<br />
-          {globalThis.outputMeta["size"][2]}
-          <br />
-        </info>
-      );
+      // thisWindow.modal(
+      //   <info>
+      //     Min: {globalThis.outputMeta["min"]}
+      //     <br />
+      //     Max: {globalThis.outputMeta["max"]}
+      //     <br />
+      //     Spacing:
+      //     <br />
+      //     {globalThis.outputMeta["spacing"][0]},<br />
+      //     {globalThis.outputMeta["spacing"][1]},<br />
+      //     {globalThis.outputMeta["spacing"][2]}
+      //     <br />
+      //     Size:
+      //     <br />
+      //     {globalThis.outputMeta["size"][0]},<br />
+      //     {globalThis.outputMeta["size"][1]},<br />
+      //     {globalThis.outputMeta["size"][2]}
+      //     <br />
+      //   </info>
+      // );
 
       thisWindow.appWindow.convertDICOM(
         globalThis.dicomPath,

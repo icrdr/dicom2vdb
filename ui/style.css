@@ -93,13 +93,13 @@ html {
 }
 
 .folder-input-btn:hover {
-  background-color: #2A6BFF;
+  background-color: #2a6bff;
   color: #ffffff;
 }
 
 .folder-input-btn:disabled,
-.folder-input-btn[disabled]{
-  background-color: #78A1FE;
+.folder-input-btn[disabled] {
+  background-color: #78a1fe;
 }
 
 .folder-input-btn-icon {
@@ -116,7 +116,7 @@ html {
 
   width: 260px;
   background: #ffffff;
-  color: #9397A6;
+  color: #9397a6;
   border: 1px solid #e5e6eb;
   border-radius: 4px;
   padding: 0px 11px;
@@ -186,7 +186,7 @@ html {
 }
 
 .meta-table input caption {
-  color: #9397A6;
+  color: #9397a6;
   padding: 0;
   line-height: 26px;
   height: 26px;
@@ -194,7 +194,7 @@ html {
 }
 
 .output input caption {
-  color: #2A6BFF;
+  color: #2a6bff;
 }
 
 .arrow-containter {
@@ -222,7 +222,7 @@ html {
   font-size: 14px;
   text-align: center;
   line-height: 40px;
-  color:#ffffff
+  color: #ffffff;
 }
 
 .convert-btn {
@@ -230,29 +230,45 @@ html {
   height: 40px;
   background: #3f7aff;
   border-radius: 4px;
+  position: relative;
+}
+
+.convert-btn-text {
   font-size: 14px;
   text-align: center;
   line-height: 40px;
-  color:#ffffff
+  color: #ffffff;
+  position: absolute;
+  width: 640px;
+  top: 0%;
+  left: 0%;
 }
 
 .convert-btn:hover {
-  background-color: #2A6BFF;
+  background-color: #2a6bff;
   color: #ffffff;
 }
 
 .convert-btn:disabled,
-.convert-btn[disabled]{
-  background-color: #78A1FE;
+.convert-btn[disabled] {
+  background-color: #78a1fe;
+}
+
+.convert-progress {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  background: #3f7aff;
+  width: 0%;
+  height: 100%;
+  transition: width 2s;
+  border-radius: 4px;
 }
 
 .banner-container {
   width: 640px;
   height: 180px;
-
-  /* Inside auto layout */
-
-  flex: none;
-  order: 2;
-  flex-grow: 0;
+  border-radius: 4px;
+  background-image: url(banner.png);
+  background-color: #ffffff;
 }
