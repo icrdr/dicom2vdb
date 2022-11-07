@@ -82,8 +82,11 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
             res.set_item("state", 2);
             callback.call(res);
 
-            ImageType::Pointer image = reader->GetOutput();
-            ImageType::PointType inputOrigin = image->GetOrigin();
+            ImageType::Pointer inputImage = reader->GetOutput();
+            ImageType::PointType inputOrigin = inputImage->GetOrigin();
+            ImageType::SpacingType inputSpacing = inputImage->GetSpacing();
+            ImageType::RegionType inputRegion = inputImage->GetLargestPossibleRegion();
+            ImageType::SizeType inputSize = inputRegion.GetSize();
 
             // rescale value
             using RescaleFilterType = itk::RescaleIntensityImageFilter<ImageType, ImageType>;
@@ -98,16 +101,16 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
             printf("Min: %.1f\n", min_val);
             printf("Max: %.1f\n", max_val);
 
-            rescalefilter->SetInput(image);
+            rescalefilter->SetInput(inputImage);
             rescalefilter->SetOutputMinimum(min_val);
             rescalefilter->SetOutputMaximum(max_val);
             rescalefilter->Update();
-            image = rescalefilter->GetOutput();
+            inputImage = rescalefilter->GetOutput();
 
             // resample size
             ImageType::SizeType outputSize;
             ImageType::SpacingType outputSpacing;
-            ImageType::PointType outputOrigin = inputOrigin;
+            ImageType::PointType outputOrigin;
 
             using TransformType = itk::IdentityTransform<ScaleType, Dimension>;
             using LinearInterpolatorType = itk::LinearInterpolateImageFunction<ImageType, ScaleType>;
@@ -127,16 +130,18 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
             {
                 outputSpacing[dim] = spacing_val[dim];
                 outputSize[dim] = size_val[dim];
+                outputOrigin[dim] = inputOrigin[dim] + 0.5 * (outputSpacing[dim] - inputSpacing[dim]);
             }
 
-            resampleFilter->SetInput(image);
+            resampleFilter->SetInput(inputImage);
             resampleFilter->SetTransform(transformer);
             resampleFilter->SetInterpolator(interpolator);
             resampleFilter->SetSize(outputSize);
             resampleFilter->SetOutputSpacing(outputSpacing);
-            resampleFilter->SetOutputOrigin(outputOrigin);
+            resampleFilter->SetOutputOrigin(inputOrigin);
+            resampleFilter->SetOutputDirection(inputImage->GetDirection());
             resampleFilter->Update();
-            image = resampleFilter->GetOutput();
+            inputImage = resampleFilter->GetOutput();
 
             res.set_item("data", "30%");
             res.set_item("state", 2);
@@ -160,7 +165,7 @@ int _convertDICOM(sciter::value dicomPath, sciter::value outputPath, sciter::val
 
             using IteratorType = itk::ImageRegionIteratorWithIndex<ImageType>;
             // iterator reading image value
-            IteratorType imageIter(image, image->GetRequestedRegion());
+            IteratorType imageIter(inputImage, inputImage->GetRequestedRegion());
             for (imageIter.GoToBegin(); !imageIter.IsAtEnd(); ++imageIter)
             {
                 ImageType::IndexType index = imageIter.GetIndex(); // get itk coordinate
